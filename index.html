@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Your CV</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .success-message {
+      color: green;
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Submit Your CV</h2>
+    <form id="cvForm">
+      <label for="email">Email:</label>
+      <input type="email" name="email" required />
+
+      <label for="cv">Paste Your CV:</label>
+      <textarea name="cv" rows="6" required></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+    <div class="success-message" id="successMessage">✅ CV submitted successfully!</div>
+  </div>
+
+  <script>
+    document.getElementById("cvForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        email: form.email.value,
+        cv: form.cv.value
+      };
+
+      try {
+        const res = await fetch("YOUR_N8N_WEBHOOK_URL_HERE", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          form.style.display = "none";
+          document.getElementById("successMessage").style.display = "block";
+        } else {
+          alert("Something went wrong. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network error. Please try again.");
+      }
+    });
+  </script>
+
+</body>
+</html>
