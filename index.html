@@ -6,89 +6,202 @@
   <title>Submit Your CV</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* Background will be set by JavaScript */
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
+      transition: background 1.5s ease; /* Smooth transition for background change */
     }
     .form-container {
       background-color: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      max-width: 400px;
-      width: 100%;
+      padding: 35px 30px;
+      border-radius: 15px;
+      /* Enhanced, softer drop shadow */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 0, 0, 0.05);
+      max-width: 420px;
+      width: 90%; /* Better for mobile */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 0, 0, 0.1);
     }
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      color: #333;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05); /* Subtle shadow on text */
     }
-    input, textarea, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      background-color: #007BFF;
-      color: white;
+    label {
       font-weight: bold;
+      font-size: 14px;
+      margin-top: 15px;
+      display: block;
+      color: #444;
+    }
+    input, textarea {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle inner shadow */
+    }
+    input:focus, textarea:focus {
+      border-color: #007BFF;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    /* Style for the file input */
+    input[type="file"] {
+      padding: 10px;
+      background-color: #f9f9f9;
       cursor: pointer;
     }
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #007BFF;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Button shadow */
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.01);
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
     .success-message {
-      color: green;
-      margin-top: 20px;
+      color: #28a745;
+      margin-top: 25px;
       display: none;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    /* 📱 Mobile Responsiveness */
+    @media (max-width: 600px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        padding: 20px 0;
+      }
+      .form-container {
+        padding: 25px 20px;
+        max-width: 90%;
+      }
+      h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="form-container">
-    <h2>Submit Your CV</h2>
+    <h2>📄 Submit Your CV</h2>
     <form id="cvForm">
+      
       <label for="email">Email:</label>
-      <input type="email" name="email" required />
+      <input type="email" name="email" required placeholder="Enter your email"/>
 
-      <label for="cv">Paste Your CV:</label>
-      <textarea name="cv" rows="6" required></textarea>
+      <label for="cvFile">Upload CV File:</label>
+      <input type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx" required/>
 
-      <button type="submit">Submit</button>
+      <label for="cvText">Or Paste Your CV:</label>
+      <textarea id="cvText" name="cvText" rows="6" placeholder="Paste your CV here..."></textarea>
+
+      <button type="submit" id="submitBtn">Submit</button>
     </form>
     <div class="success-message" id="successMessage">✅ CV submitted successfully!</div>
   </div>
 
   <script>
-    document.getElementById("cvForm").addEventListener("submit", async function(e) {
+    const form = document.getElementById("cvForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const successMessage = document.getElementById("successMessage");
+    const cvFile = document.getElementById("cvFile");
+    const cvText = document.getElementById("cvText");
+
+    // --- 1. Random Background Generator ---
+    function getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    function setRandomBackground() {
+      const color1 = getRandomColor();
+      const color2 = getRandomColor();
+      const angle = Math.floor(Math.random() * 360);
+      document.body.style.background = `linear-gradient(${angle}deg, ${color1}, ${color2})`;
+    }
+
+    // Call on load
+    setRandomBackground();
+
+    // --- 2. Form Submission with File Upload (using FormData) ---
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
 
-      const form = e.target;
-      const data = {
-        email: form.email.value,
-        cv: form.cv.value
-      };
+      // Simple validation to ensure at least one of the CV fields is filled
+      if (!cvFile.files.length && !cvText.value.trim()) {
+        alert("Please either upload a CV file or paste your CV text.");
+        return;
+      }
 
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+
+      // Use FormData for multi-part form data (essential for file uploads)
+      const formData = new FormData(form);
+
+      // The webhook URL
+      const webhookUrl = "https://shammah2.app.n8n.cloud/webhook/CV-upload";
+      
       try {
-        const res = await fetch("https://shammah.app.n8n.cloud/webhook/CV-upload", {
+        const res = await fetch(webhookUrl, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
+          // NOTE: Do NOT set Content-Type header when using FormData. The browser handles it.
+          body: formData 
         });
 
         if (res.ok) {
           form.style.display = "none";
-          document.getElementById("successMessage").style.display = "block";
+          successMessage.style.display = "block";
         } else {
-          alert("Something went wrong. Please try again.");
+          // Attempt to read error message from response if available
+          let errorText = await res.text(); 
+          alert(`❌ Submission failed (${res.status}). Response: ${errorText.substring(0, 100)}... Please try again.`);
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Submit";
         }
       } catch (err) {
-        console.error(err);
-        alert("Network error. Please try again.");
+        console.error("Network or Fetch Error:", err);
+        alert("⚠️ Network error. Please try again.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit";
       }
     });
   </script>
